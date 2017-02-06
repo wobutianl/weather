@@ -38,7 +38,7 @@ public class WeatherDB {
 
     // 单例
     public synchronized static WeatherDB getInstance(Context context){
-        if (weatherDB != null){
+        if (weatherDB == null){
             weatherDB = new WeatherDB(context);
         }
         return weatherDB;
