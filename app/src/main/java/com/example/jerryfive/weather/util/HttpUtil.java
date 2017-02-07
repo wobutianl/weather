@@ -57,6 +57,6 @@ public class HttpUtil {
                     }
                 }
             }
-        });
+        }).start();
     }
 }

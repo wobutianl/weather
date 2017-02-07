@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -53,7 +54,7 @@ public class WeatherActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE); // 要放在 set 之前
+//        requestWindowFeature(Window.FEATURE_NO_TITLE); // 要放在 set 之前
         setContentView(R.layout.activity_weather);
 
         listView = (ListView) findViewById(R.id.list_view);
@@ -63,7 +64,7 @@ public class WeatherActivity extends Activity {
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, dataList);
         listView.setAdapter(adapter);
 
-        weatherDB = WeatherDB.getInstance( WeatherActivity.this);
+        weatherDB = WeatherDB.getInstance( this);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -151,9 +152,12 @@ public class WeatherActivity extends Activity {
             @Override
             public void onFinish(String response) {
                 boolean result = false;
+                Log.d("weather", "onfinish");
                 if("province".equals(type)){
                     // 如果是省数据，则用处理省数据的方式处理
+                    Log.d("weather", "province data from web");
                     result = Utility.handleProvinceResponse(weatherDB, response);
+                    Log.d("weather", "true");
                 }else if ("city".equals(type)){
                     result = Utility.handleCityResponse(weatherDB, response, selectedProvince.getId());
                 }else if ("county".equals(type)){
