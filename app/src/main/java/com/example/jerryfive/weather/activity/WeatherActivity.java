@@ -2,7 +2,10 @@ package com.example.jerryfive.weather.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -54,7 +57,16 @@ public class WeatherActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        requestWindowFeature(Window.FEATURE_NO_TITLE); // 要放在 set 之前
+//        requestWindowFeature(Window.FEATURE_NO_TITLE); // 要放在 set 之前,现在在主题中设置，这里设置会被主题设置覆盖
+
+        // 如果之前就有县数据存储到了Shared中，则直接显示天气信息，而不再需要选择
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        if(prefs.getBoolean("city_selected", false)){
+            Intent intent = new Intent(this, WeatherInfoActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
         setContentView(R.layout.activity_weather);
 
         listView = (ListView) findViewById(R.id.list_view);
@@ -75,6 +87,13 @@ public class WeatherActivity extends Activity {
                 } else if(currentLevel == LEVEL_CITY){
                     selectedCity = cityList.get(i);
                     queryCounty();
+                }else if(currentLevel == LEVEL_COUNTY){
+                    // 从选择界面进入天气显示界面 。
+                    String countyCode = countyList.get(i).getCounty_code();
+                    Intent intent = new Intent(WeatherActivity.this, WeatherInfoActivity.class);
+                    intent.putExtra("county_code", countyCode);
+                    startActivity(intent);
+                    finish();
                 }
             }
         });
