@@ -1,5 +1,6 @@
 package com.example.jerryfive.weather.activity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import android.text.Layout;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -32,6 +34,9 @@ public class WeatherInfoActivity extends AppCompatActivity {
     private TextView temp2Text;
     private TextView currentDateTime;
 
+    private Button btn_switch_city;
+    private Button btn_refresh;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +51,9 @@ public class WeatherInfoActivity extends AppCompatActivity {
         temp2Text = (TextView)findViewById(R.id.temp2);
         currentDateTime = (TextView)findViewById(R.id.current_date);
 
+        btn_switch_city = (Button)findViewById(R.id.switch_city);
+        btn_refresh = (Button)findViewById(R.id.refresh_weather);
+
         // 从传来的Activity中获取 county code 信息。这里可以写一个StartActivity函数
         String countyCode = getIntent().getStringExtra("county_code");
         if(!TextUtils.isEmpty(countyCode)){
@@ -58,6 +66,29 @@ public class WeatherInfoActivity extends AppCompatActivity {
         }else {
             showWeather();
         }
+
+        btn_switch_city.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(WeatherInfoActivity.this, WeatherActivity.class);
+                intent.putExtra("from_weather_info_act", true);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        btn_refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                publishText.setText("同步中...");
+                // 从SharedReference 中获取当前WeatherCode，然后调用查询语句，获取天气信息。
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(WeatherInfoActivity.this);
+                String weatherCode = prefs.getString("weather_code", "");
+                if (!TextUtils.isEmpty(weatherCode)){
+                    queryWeatherInfo(weatherCode);
+                }
+            }
+        });
         //
     }
 

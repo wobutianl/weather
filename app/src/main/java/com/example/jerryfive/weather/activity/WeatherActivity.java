@@ -54,14 +54,18 @@ public class WeatherActivity extends Activity {
     // 当前级别
     private int currentLevel;
 
+    // 是否从WeatherInfo 来
+    private boolean isFromWeatherInfo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        requestWindowFeature(Window.FEATURE_NO_TITLE); // 要放在 set 之前,现在在主题中设置，这里设置会被主题设置覆盖
+        isFromWeatherInfo = getIntent().getBooleanExtra("from_weather_info_act", false);
 
         // 如果之前就有县数据存储到了Shared中，则直接显示天气信息，而不再需要选择
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        if(prefs.getBoolean("city_selected", false)){
+        if(prefs.getBoolean("city_selected", false) && !isFromWeatherInfo){
             Intent intent = new Intent(this, WeatherInfoActivity.class);
             startActivity(intent);
             finish();
@@ -238,6 +242,11 @@ public class WeatherActivity extends Activity {
         }else if(currentLevel == LEVEL_CITY){
             queryProvince();
         }else{
+            // 如果当前是省一级，且来自于天气界面，则直接返回到天气界面 。
+            if(isFromWeatherInfo){
+                Intent intent = new Intent(this, WeatherInfoActivity.class);
+                startActivity(intent);
+            }
             finish();
         }
     }
